@@ -43,3 +43,27 @@ A project to create a daily newsletter of the top posts from Hacker News.
     *   `Jinja2` for HTML templating.
 *   **Frontend:** HTML & CSS for the newsletter template.
 *   **Automation:** GitHub Actions or a system cron job.
+
+## How to Run
+
+1.  **Create a virtual environment:**
+    ```bash
+    python3 -m venv .venv
+    ```
+
+2.  **Activate the virtual environment:**
+    ```bash
+    source .venv/bin/activate
+    ```
+
+3.  **Install the dependencies:**
+    ```bash
+    uv pip install -r requirements.txt
+    ```
+
+4.  **Start the Flask server:**
+    ```bash
+    python hacker-news-letter/api_integration/scraper.py
+    ```
+    The server will be running at `http://127.0.0.1:5000`.
+    You can access the API at `http://127.0.0.1:5000/api/top-stories`.
