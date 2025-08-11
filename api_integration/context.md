@@ -27,17 +27,15 @@ To scrape the Hacker News website to get the top stories from the last 24 hours 
 *   [x] Filter the stories to include only those posted within the last 24 hours.
 *   [x] Create a simple API using `Flask`.
 *   [x] Create a `requirements.txt` file and add `requests`, `beautifulsoup4`, and `flask` to it.
-*   [ ] Add more robust error handling for network requests and parsing.
-    *   [ ] Handle `requests.exceptions.RequestException` for network errors.
-    *   [ ] Handle `AttributeError` and `TypeError` during parsing to gracefully skip stories with unexpected structures.
-*   [ ] Add logging to the script.
-*   [ ] Add unit tests for the `parse_age_to_timestamp` function and the scraping logic.
-    *   [ ] Create a `tests` directory.
-    *   [ ] Create `test_scraper.py`.
-    *   [ ] Use a mocking library (like `pytest-mock`) to mock the `requests.get` call and provide a sample HTML file for testing the parsing logic.
+*   [x] Add more robust error handling for network requests and parsing.
+    *   [x] Handle `requests.exceptions.RequestException` for network errors.
+    *   [x] Handle `AttributeError` and `TypeError` during parsing to gracefully skip stories with unexpected structures.
+*   [x] Add logging to the script.
+*   [x] Add unit tests for the `parse_age_to_timestamp` function and the scraping logic.
+    *   [x] Create a `tests` directory.
+    *   [x] Create `test_scraper.py`.
+    *   [x] Use a mocking library (like `pytest-mock`) to mock the `requests.get` call and provide a sample HTML file for testing the parsing logic.
 
 ## Remaining Tasks
 
-*   **Error Handling:** The current error handling is basic. More specific error handling for different network and parsing errors should be added.
-*   **Logging:** There is no logging in the script. Logging should be added to provide better insights into the script's execution and to help with debugging.
-*   **Unit Tests:** Unit tests should be added to ensure the correctness of the `parse_age_to_timestamp` function and the scraping logic.
+*   **Logging:** The logging is basic. More advanced logging configuration can be added, for example, logging to a file.
