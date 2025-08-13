@@ -61,9 +61,43 @@ A project to create a daily newsletter of the top posts from Hacker News.
     uv pip install -r requirements.txt
     ```
 
-4.  **Start the Flask server:**
+4.  **Start the Flask server (API):**
     ```bash
-    python hacker-news-letter/api_integration/scraper.py
+    python api_integration/api.py
     ```
     The server will be running at `http://127.0.0.1:5000`.
     You can access the API at `http://127.0.0.1:5000/api/top-stories`.
+
+5.  **Use the scraper as a CLI:**
+    - Print JSON to stdout
+      ```bash
+      python api_integration/scraper.py
+      ```
+    - Write JSON to a file
+      ```bash
+      python api_integration/scraper.py --output output.json
+      ```
+    - Minified JSON
+      ```bash
+      python api_integration/scraper.py --no-pretty
+      ```
+
+6.  **Make targets:**
+    - Start API only
+      ```bash
+      make run_api
+      ```
+    - Start UI only (served at `http://127.0.0.1:8080`)
+      ```bash
+      make run_ui
+      ```
+    - Start both API (5000) and UI (8080)
+      ```bash
+      make run_all
+      ```
+    - Legacy alias (API only)
+      ```bash
+      make run
+      ```
+
+    The UI auto-detects if it's running on port `8080` and will call the API at `http://127.0.0.1:5000`. You can override the API base URL by setting `window.API_BASE_URL` before `app.js` runs.

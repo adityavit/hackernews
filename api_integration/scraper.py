@@ -1,16 +1,15 @@
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
-from flask import Flask, jsonify
 import logging
+import json
+import argparse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # URL to scrape
 URL = "https://news.ycombinator.com/"
-
-app = Flask(__name__)
 
 def parse_age_to_timestamp(age_string):
     """
@@ -108,10 +107,32 @@ def scrape_hacker_news():
     logging.info(f"Found {len(stories)} stories from the last 24 hours.")
     return stories
 
-@app.route('/api/top-stories')
-def get_top_stories():
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Scrape Hacker News top stories from the last 24 hours and output JSON."
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="File path to write the JSON output. If omitted, prints to stdout.",
+    )
+    parser.add_argument(
+        "--no-pretty",
+        action="store_true",
+        help="Do not pretty-print JSON (minified output).",
+    )
+
+    args = parser.parse_args()
+
     stories = scrape_hacker_news()
-    return jsonify(stories)
+
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as output_file:
+            json.dump(stories, output_file, indent=None if args.no_pretty else 2, ensure_ascii=False)
+    else:
+        print(json.dumps(stories, indent=None if args.no_pretty else 2, ensure_ascii=False))
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    main()
