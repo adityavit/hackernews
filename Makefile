@@ -5,6 +5,7 @@ VENV_ACTIVATE = source .venv/bin/activate
 
 # UI port (can be overridden: `make run_ui UI_PORT=3000`)
 UI_PORT ?= 8081
+API_PORT ?= 5000
 
 # Command to run the Flask server (API)
 RUN_SERVER = $(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && python api_integration/api.py
@@ -39,3 +40,11 @@ test:
 run: run_api
 
 .PHONY: run run_api run_ui run_all test
+
+# Stop all running services (by port)
+stop_all:
+	@echo "Stopping services on API $(API_PORT) and UI $(UI_PORT) ports..."
+	@bash -c 'pids=$$(lsof -ti tcp:$(API_PORT)); if [ -n "$$pids" ]; then echo "Stopping API (PIDs: $$pids)"; kill $$pids || true; sleep 0.5; pids2=$$(lsof -ti tcp:$(API_PORT)); [ -n "$$pids2" ] && kill -9 $$pids2 || true; else echo "No process on port $(API_PORT)"; fi'
+	@bash -c 'pids=$$(lsof -ti tcp:$(UI_PORT)); if [ -n "$$pids" ]; then echo "Stopping UI (PIDs: $$pids)"; kill $$pids || true; sleep 0.5; pids2=$$(lsof -ti tcp:$(UI_PORT)); [ -n "$$pids2" ] && kill -9 $$pids2 || true; else echo "No process on port $(UI_PORT)"; fi'
+
+.PHONY: stop_all

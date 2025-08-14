@@ -68,7 +68,7 @@ A project to create a daily newsletter of the top posts from Hacker News.
     The server will be running at `http://127.0.0.1:5000`.
     You can access the API at `http://127.0.0.1:5000/api/top-stories`.
 
-5.  **Use the scraper as a CLI:**
+5.  **Use the scraper as a CLI (top stories):**
     - Print JSON to stdout
       ```bash
       python api_integration/scraper.py
@@ -82,7 +82,25 @@ A project to create a daily newsletter of the top posts from Hacker News.
       python api_integration/scraper.py --no-pretty
       ```
 
-6.  **Make targets:**
+6.  **Use the comment scraper as a CLI (story details + comments):**
+    - Print story and comments to stdout
+      ```bash
+      python api_integration/comment_scraper.py <story_id>
+      ```
+    - Limit number of comments and depth
+      ```bash
+      python api_integration/comment_scraper.py <story_id> --limit 20 --max-depth 1
+      ```
+    - Write output to a file (pretty-printed)
+      ```bash
+      python api_integration/comment_scraper.py <story_id> -o comments.json
+      ```
+    - Minified JSON
+      ```bash
+      python api_integration/comment_scraper.py <story_id> --no-pretty
+      ```
+
+7.  **Make targets:**
     - Start API only
       ```bash
       make run_api
@@ -101,3 +119,13 @@ A project to create a daily newsletter of the top posts from Hacker News.
       ```
 
     The UI auto-detects if it's running on port `8080` and will call the API at `http://127.0.0.1:5000`. You can override the API base URL by setting `window.API_BASE_URL` before `app.js` runs.
+
+8.  **Stop running services:**
+    - Stop both API and UI by their ports (defaults: API 5000, UI 8081)
+      ```bash
+      make stop_all
+      ```
+    - Override ports if needed
+      ```bash
+      make stop_all API_PORT=5000 UI_PORT=3000
+      ```
