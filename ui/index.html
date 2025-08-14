@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hacker News Top Stories</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="container">
+        <h1>Hacker News Top Stories</h1>
+        <p class="subtitle">Top posts from the last 24 hours</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <section id="controls" class="controls">
+        <button id="refreshBtn" type="button">Refresh</button>
+        <span id="status" role="status" aria-live="polite"></span>
+      </section>
+
+      <section id="content">
+        <ul id="stories" class="stories" aria-label="Top stories list"></ul>
+      </section>
+    </main>
+
+    <template id="story-item-template">
+      <li class="story">
+        <h2 class="story-title"><a class="story-link" target="_blank" rel="noopener"></a></h2>
+        <div class="story-meta">
+          <span class="score"></span>
+          <span class="user"></span>
+          <span class="age"></span>
+          <span class="comments"></span>
+        </div>
+      </li>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+  </html>
+
+
