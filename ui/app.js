@@ -69,36 +69,38 @@ function createStoryElement(story) {
 
   const summaryBtn = node.querySelector('.summary-link');
   const panel = node.querySelector('.summary-panel');
-  summaryBtn.addEventListener('click', async () => {
-    const expanded = summaryBtn.getAttribute('aria-expanded') === 'true';
-    if (expanded) {
-      panel.hidden = true;
-      summaryBtn.setAttribute('aria-expanded', 'false');
-      summaryBtn.textContent = 'View summary';
-      return;
-    }
-    summaryBtn.disabled = true;
-    summaryBtn.textContent = 'Loading…';
-    try {
-      const url = SUMMARY_URL(story.id, 'max_depth=1&limit=40');
-      const res = await fetch(url, { headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      renderSummary(panel, data);
-      panel.hidden = false;
-      summaryBtn.setAttribute('aria-expanded', 'true');
-      summaryBtn.textContent = 'Hide summary';
-    } catch (e) {
-      panel.hidden = false;
-      panel.querySelector('.summary-content').innerHTML = `<p>Failed to load summary: ${escapeHtml(e.message)}</p>`;
-      summaryBtn.setAttribute('aria-expanded', 'true');
-      summaryBtn.textContent = 'Hide summary';
-    } finally {
-      summaryBtn.disabled = false;
-    }
-  });
+  summaryBtn.addEventListener('click', () => handleSummaryToggle({ button: summaryBtn, panel, storyId: story.id }));
 
   return node;
+}
+
+async function handleSummaryToggle({ button, panel, storyId }) {
+  const expanded = button.getAttribute('aria-expanded') === 'true';
+  if (expanded) {
+    panel.hidden = true;
+    button.setAttribute('aria-expanded', 'false');
+    button.textContent = 'View summary';
+    return;
+  }
+  button.disabled = true;
+  button.textContent = 'Loading…';
+  try {
+    const url = SUMMARY_URL(storyId, 'max_depth=1&limit=40');
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    renderSummary(panel, data);
+    panel.hidden = false;
+    button.setAttribute('aria-expanded', 'true');
+    button.textContent = 'Hide summary';
+  } catch (e) {
+    panel.hidden = false;
+    panel.querySelector('.summary-content').innerHTML = `<p>Failed to load summary: ${escapeHtml(e.message)}</p>`;
+    button.setAttribute('aria-expanded', 'true');
+    button.textContent = 'Hide summary';
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function loadStories() {
