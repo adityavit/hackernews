@@ -103,4 +103,22 @@ button:hover { background: var(--accent-2); }
 .score::before { content: "▲ "; color: var(--accent-2); }
 .comments::after { content: " comments"; }
 
+.summary-link {
+  margin-left: auto;
+  background: transparent;
+  color: var(--accent-2);
+  border: 1px solid var(--border);
+}
+
+.summary-panel {
+  margin-top: 10px;
+  background: #10141c;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.summary-content h3 { margin: 8px 0; }
+.summary-content ul { padding-left: 18px; }
+
 
