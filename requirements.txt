@@ -4,3 +4,11 @@ Flask
 flask-cors
 pytest
 pytest-mock
+fastapi
+uvicorn
+typer
+pydantic
+numpy
+pandas
+scikit-learn
+scipy

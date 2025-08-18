@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hackernews-comment-analysis"
+version = "0.1.0"
+description = "Local comment analysis service using Ollama (API + CLI)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "typer",
+  "pydantic",
+  "requests",
+  "numpy",
+  "pandas",
+  "scikit-learn",
+  "scipy",
+]
+
+[project.scripts]
+comments-analyze = "llm_integration.cli:main"
+
+

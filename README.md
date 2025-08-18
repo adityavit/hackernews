@@ -67,6 +67,12 @@ A project to create a daily newsletter of the top posts from Hacker News.
     ```
     The server will be running at `http://127.0.0.1:5000`.
     You can access the API at `http://127.0.0.1:5000/api/top-stories`.
+    
+    Comment analysis (summary) endpoint (requires local Ollama running):
+    
+    ```bash
+    curl "http://127.0.0.1:5000/api/stories/<story_id>/comments/summary?max_depth=1&limit=30&chat_model=llama3.1:8b-instruct&embed_model=nomic-embed-text&weights=0.45,0.45,0.10"
+    ```
 
 5.  **Use the scraper as a CLI (top stories):**
     - Print JSON to stdout
@@ -121,6 +127,108 @@ A project to create a daily newsletter of the top posts from Hacker News.
     The UI auto-detects if it's running on port `8080` and will call the API at `http://127.0.0.1:5000`. You can override the API base URL by setting `window.API_BASE_URL` before `app.js` runs.
 
 8.  **Stop running services:**
+
+## LLM Integration (Local Comment Analysis Service)
+
+This component lives in `llm_integration/` and provides both a FastAPI service and a Typer CLI to analyze comment arrays using a local Ollama server.
+
+### Install dependencies
+
+```bash
+uv pip install -r requirements.txt
+uv pip install -e .
+```
+
+Or with pip:
+
+```bash
+pip install -r requirements.txt
+pip install -e .
+```
+
+### Start API
+
+```bash
+python -m llm_integration.api
+# or
+uvicorn llm_integration.api:app --host 0.0.0.0 --port 8080
+```
+
+Health:
+
+```bash
+curl http://localhost:8080/health
+```
+
+Analyze:
+
+```bash
+curl -X POST http://localhost:8080/analyze \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "comments": [
+          {"id":"1","author":"alice","text":"I agree with the post and add a point"},
+          {"id":"2","author":"bob","text":"I disagree strongly for reasons X and Y"}
+        ],
+        "original_post": "Short description of the post",
+        "chat_model": "llama3.1:8b-instruct",
+        "embed_model": "nomic-embed-text",
+        "topk": 10,
+        "max_summary_comments": 40,
+        "weights": [0.45,0.45,0.10]
+      }'
+```
+
+### CLI usage
+
+```bash
+comments-analyze analyze \
+  --input comments.json \
+  --original-post post.txt \
+  --ollama-host http://localhost:11434 \
+  --chat-model llama3.1:8b-instruct \
+  --embed-model nomic-embed-text \
+  --topk 10 \
+  --max-summary-comments 40 \
+  --weights "0.45,0.45,0.10" \
+  --out-json results.json \
+  --out-csv results.csv \
+  --out-md results.md
+```
+
+If `--input -` (or omitted), the tool reads JSON from stdin. `--original-post` is optional and, if provided, reads the text file.
+
+### Configuration
+
+Default constants (top of `llm_integration/config.py`):
+
+```text
+OLLAMA_HOST_DEFAULT = "http://localhost:11434"
+CHAT_MODEL_DEFAULT = "gpt-oss:20b"
+EMBED_MODEL_DEFAULT = "nomic-embed-text"
+TOPK_DEFAULT = 10
+MAX_SUMMARY_COMMENTS_DEFAULT = 40
+```
+
+Override precedence:
+1) API payload fields, 2) CLI flags, 3) env vars (`OLLAMA_HOST`, `CHAT_MODEL`, `EMBED_MODEL`), 4) defaults.
+
+### Sample input
+
+```json
+[
+  {
+    "id": "44902240",
+    "author": "canyon289",
+    "text": "Hi all, I built these models with a great team...",
+    "age": "2 days ago",
+    "timestamp": "2025-08-14T13:22:29.296614",
+    "depth": 0,
+    "parent_id": null
+  }
+]
+```
+
     - Stop both API and UI by their ports (defaults: API 5000, UI 8081)
       ```bash
       make stop_all

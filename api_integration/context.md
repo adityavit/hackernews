@@ -74,11 +74,12 @@ To scrape the Hacker News website to get the top stories from the last 24 hours 
 - [ ] Performance pass (avoid N+1 network calls where possible)
 
 ### 2) Summarize comments using LLMs
-- [ ] Create provider-agnostic LLM client interface
-- [ ] Add environment-driven config (API keys, model names, timeouts)
-- [ ] Design summarization prompt (bullet points, consensus, disagreements, insights)
-- [ ] Implement input selection/chunking for comments (token budget aware)
+- [x] Create provider-agnostic LLM client interface (via `llm_integration/ollama_client.py`)
+- [x] Add environment-driven config (model names, host) and overrides (API/CLI/env)
+- [x] Design summarization/classification prompts and wire through analysis
+- [x] Implement representative selection (MMR) for summary subset
+- [ ] Implement token-budget-aware chunking (beyond current MMR subset)
 - [ ] Implement caching with TTL keyed by story id
-- [ ] Add API route: `GET /api/stories/<id>/summary` (on-demand compute + cache)
+- [x] Add API route: `GET /api/stories/<id>/comments/summary` (on-demand compute)
 - [ ] Unit tests with mocked LLM client (success, failure, cache hit)
-- [ ] Handle provider errors, rate limits, and fallbacks gracefully
+- [x] Handle retries and basic errors gracefully (Ollama client retries)
