@@ -1,11 +1,46 @@
 const isSameOriginApi = !location.port || location.port === "5000";
-const API_BASE = window.API_BASE_URL || (isSameOriginApi ? "" : `http://${location.hostname}:5000`);
+const API_BASE = window.API_BASE_URL || (isSameOriginApi ? "" : `http://${location.hostname}:8081`);
 const API_URL = `${API_BASE}/api/top-stories`;
 const SUMMARY_URL = (id, params = "") => `${API_BASE}/api/stories/${id}/comments/summary${params ? `?${params}` : ""}`;
 
 function setStatus(message) {
   const status = document.getElementById("status");
   status.textContent = message || "";
+}
+
+function updateFetchedAt(timestamp) {
+  const el = document.getElementById("fetchedAt");
+  if (!el) return;
+
+  if (!timestamp) {
+    el.textContent = "";
+    el.hidden = true;
+    el.removeAttribute('title');
+    return;
+  }
+
+  const date = new Date(timestamp);
+  if (Number.isNaN(date.getTime())) {
+    el.textContent = `Fetched at ${timestamp}`;
+    el.hidden = false;
+    el.removeAttribute('title');
+    return;
+  }
+
+  const formatted = formatFetchTimestamp(date);
+  el.textContent = `Fetched ${formatted}`;
+  el.hidden = false;
+  el.title = date.toISOString();
+}
+
+function formatFetchTimestamp(date) {
+  const formatter = new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const label = formatter.format(date);
+  return timezone ? `${label} (${timezone})` : label;
 }
 
 function renderSummary(container, data) {
@@ -51,6 +86,10 @@ function createStoryElement(story) {
   const template = document.getElementById("story-item-template");
   const node = template.content.cloneNode(true);
 
+  // annotate root <li> with story id for delegated handlers
+  const root = node.querySelector('li.story');
+  if (root) root.dataset.storyId = String(story.id || '');
+
   const link = node.querySelector(".story-link");
   link.textContent = story.title || "Untitled";
   link.href = story.url || "#";
@@ -67,14 +106,11 @@ function createStoryElement(story) {
   const comments = node.querySelector(".comments");
   comments.textContent = typeof story.comments === "number" ? story.comments : 0;
 
-  const summaryBtn = node.querySelector('.summary-link');
-  const panel = node.querySelector('.summary-panel');
-  summaryBtn.addEventListener('click', () => handleSummaryToggle({ button: summaryBtn, panel, storyId: story.id }));
-
   return node;
 }
 
 async function handleSummaryToggle({ button, panel, storyId }) {
+  console.log("handleSummaryToggle", { button, panel, storyId });
   const expanded = button.getAttribute('aria-expanded') === 'true';
   if (expanded) {
     panel.hidden = true;
@@ -104,19 +140,35 @@ async function handleSummaryToggle({ button, panel, storyId }) {
 }
 
 async function loadStories() {
+  console.log("loadStories");
   const list = document.getElementById("stories");
   list.innerHTML = "";
   setStatus("Loading...");
+  updateFetchedAt(null);
 
   try {
     const response = await fetch(API_URL, { headers: { Accept: "application/json" } });
+    console.log("loadStories response", response);
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    const stories = await response.json();
-    if (!Array.isArray(stories)) {
-      throw new Error("Invalid payload");
+    const payload = await response.json();
+
+    let stories;
+    let generatedAt;
+    if (Array.isArray(payload)) {
+      stories = payload;
+    } else if (payload && typeof payload === 'object') {
+      if (!Array.isArray(payload.data)) {
+        throw new Error("Invalid payload: missing data array");
+      }
+      stories = payload.data;
+      generatedAt = payload.generated_at || payload.generatedAt || null;
+    } else {
+      throw new Error("Invalid payload format");
     }
+
+    updateFetchedAt(generatedAt);
 
     if (stories.length === 0) {
       setStatus("No stories found.");
@@ -131,13 +183,23 @@ async function loadStories() {
     setStatus("");
   } catch (err) {
     setStatus(`Failed to load stories: ${err.message}`);
+    updateFetchedAt(null);
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const refreshBtn = document.getElementById("refreshBtn");
   refreshBtn.addEventListener("click", loadStories);
+  // delegated click handler for summary toggle
+  const list = document.getElementById('stories');
+  list.addEventListener('click', (e) => {
+    const btn = e.target.closest('.summary-link');
+    if (!btn) return;
+    const item = btn.closest('li.story');
+    if (!item) return;
+    const panel = item.querySelector('.summary-panel');
+    const storyId = item.dataset.storyId;
+    handleSummaryToggle({ button: btn, panel, storyId });
+  });
   loadStories();
 });
-
-

@@ -10,8 +10,8 @@ API_PORT ?= 5000
 # Command to run the Flask server (API)
 RUN_SERVER = $(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && python api_integration/api.py
 
-# Command to serve the UI (static server)
-RUN_UI = cd ui && python -m http.server $(UI_PORT)
+# Command to serve the UI (Flask app for static + JSON under /api)
+RUN_UI = cd ui && UI_PORT=$(UI_PORT) flask --app server run --host 0.0.0.0 --port $(UI_PORT)
 
 # Command to run the tests
 RUN_TESTS = $(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && pytest tests/
@@ -29,7 +29,7 @@ run_ui:
 # Target to run both API and UI servers
 run_all:
 	@echo "Starting API (5000) and UI ($(UI_PORT)) servers..."
-	@bash -c '$(RUN_SERVER) & PID_API=$$!; cd ui && python -m http.server $(UI_PORT) & PID_UI=$$!; wait $$PID_API $$PID_UI'
+	@bash -c '$(RUN_SERVER) & PID_API=$$!; cd ui && UI_PORT=$(UI_PORT) flask --app server run --host 0.0.0.0 --port $(UI_PORT) & PID_UI=$$!; wait $$PID_API $$PID_UI'
 
 # Target to run the tests
 test:
@@ -48,3 +48,10 @@ stop_all:
 	@bash -c 'pids=$$(lsof -ti tcp:$(UI_PORT)); if [ -n "$$pids" ]; then echo "Stopping UI (PIDs: $$pids)"; kill $$pids || true; sleep 0.5; pids2=$$(lsof -ti tcp:$(UI_PORT)); [ -n "$$pids2" ] && kill -9 $$pids2 || true; else echo "No process on port $(UI_PORT)"; fi'
 
 .PHONY: stop_all
+
+# Dump top stories JSON for UI via automation script
+dump_top_stories:
+	@echo "Dumping top stories JSON to ui/api/top-stories.json ..."
+	@bash automation/dump_top_stories.sh
+
+.PHONY: dump_top_stories
