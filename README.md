@@ -229,6 +229,63 @@ Override precedence:
 ]
 ```
 
+## Webpage Content Analysis
+
+The project includes a comprehensive webpage content analysis feature that uses LLM integration to summarize and analyze web content.
+
+### Quick Start
+
+Analyze any webpage content using the Makefile target:
+
+```bash
+make analyze_content URL=https://example.com
+```
+
+This will:
+- Fetch and extract readable content from the webpage
+- Use local Ollama LLM to analyze the content
+- Return a structured JSON summary with key points, topics, tone analysis, and more
+
+### API Usage
+
+You can also use the content analysis API directly:
+
+```bash
+curl "http://127.0.0.1:5000/api/content/summary?url=https://example.com"
+```
+
+With optional LLM configuration overrides:
+
+```bash
+curl "http://127.0.0.1:5000/api/content/summary?url=https://example.com&chat_model=llama3.1:8b-instruct&ollama_host=http://localhost:11434"
+```
+
+### Requirements
+
+- **Ollama server** running locally (default: `http://localhost:11434`)
+- **LLM model** available (e.g., `llama3.1:8b-instruct`, `gpt-oss:20b`)
+
+### Configuration
+
+Override default settings via environment variables:
+
+```bash
+export OLLAMA_HOST=http://localhost:11434
+export CHAT_MODEL=llama3.1:8b-instruct
+make analyze_content URL=https://example.com
+```
+
+### Response Structure
+
+The analysis returns comprehensive metadata including:
+- **Executive Summary**: 2-3 sentence overview of main content
+- **Key Points**: Primary arguments and insights (typically 3-5 points)
+- **Topics**: Main subject areas covered
+- **Tone**: Overall writing style (informational, persuasive, technical, etc.)
+- **Content Type**: Classification (news article, blog post, documentation, etc.)
+- **Target Audience**: Intended readership
+- **Takeaways**: Actionable insights and conclusions
+
     - Stop both API and UI by their ports (defaults: API 5000, UI 8081)
       ```bash
       make stop_all

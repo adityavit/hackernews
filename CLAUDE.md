@@ -75,6 +75,7 @@ comments-analyze analyze --input comments.json       # Analyze comments with LLM
 
 ### Content Analysis
 ```bash
+make fetch_content URL=<webpage_url>                 # Fetch and extract webpage content (no LLM)
 make analyze_content URL=<webpage_url>               # Analyze webpage content using LLM
 make test_content_analysis                           # Test LLM content analysis with sample data
 ```

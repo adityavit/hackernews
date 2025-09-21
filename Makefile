@@ -74,6 +74,16 @@ full_pipeline:
 	@echo "Running full automation pipeline: cleanup -> fetch -> summaries ..."
 	@bash automation/full_pipeline.sh
 
+# Fetch webpage content without LLM analysis (requires URL parameter)
+fetch_content:
+	@if [ -z "$(URL)" ]; then \
+		echo "Usage: make fetch_content URL=<webpage_url>"; \
+		echo "Example: make fetch_content URL=https://example.com"; \
+		exit 1; \
+	fi
+	@echo "Fetching content from $(URL) ..."
+	@$(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && python api_integration/content_fetcher.py "$(URL)"
+
 # Analyze webpage content using LLM (requires URL parameter)
 analyze_content:
 	@if [ -z "$(URL)" ]; then \
@@ -99,4 +109,4 @@ test_content_only:
 	@echo "Running content analysis tests only ..."
 	@$(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && (pytest tests/test_content_analysis.py tests/test_content_summarizer.py -v 2>/dev/null || echo "pytest not available, use 'make test' instead")
 
-.PHONY: dump_top_stories dump_comment_summaries cleanup_old_stories cleanup_old_stories_dry_run full_pipeline analyze_content test_content_analysis validate_tests test_content_only test
+.PHONY: dump_top_stories dump_comment_summaries cleanup_old_stories cleanup_old_stories_dry_run full_pipeline fetch_content analyze_content test_content_analysis validate_tests test_content_only test

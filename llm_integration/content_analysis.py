@@ -100,14 +100,14 @@ def analyze_webpage_content(
         prompt = create_content_analysis_prompt(title, content, url)
 
         # Initialize Ollama client
-        client = OllamaClient(
-            host=config.ollama_host,
-            chat_model=config.chat_model,
-            embed_model=config.embed_model
-        )
+        client = OllamaClient(host=config.ollama_host)
 
         # Generate analysis
-        response = client.chat(prompt)
+        response = client.chat(
+            model=config.chat_model,
+            system="You are a helpful assistant that analyzes webpage content and provides structured summaries in JSON format.",
+            user=prompt
+        )
 
         # Parse the JSON response
         analysis_data = parse_llm_response(response)
