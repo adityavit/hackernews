@@ -28,13 +28,19 @@
 
     <template id="story-item-template">
       <li class="story">
-        <h2 class="story-title"><a class="story-link" target="_blank" rel="noopener"></a></h2>
+        <h2 class="story-title">
+          <a class="story-link" target="_blank" rel="noopener"></a>
+        </h2>
         <div class="story-meta">
           <span class="score"></span>
           <span class="user"></span>
           <span class="age"></span>
+          |
           <span class="comments"></span>
-          <button class="summary-link" type="button" aria-expanded="false">View summary</button>
+          |
+          <a class="hn-link" target="_blank" rel="noopener">discuss</a>
+          |
+          <button class="summary-link" type="button" aria-expanded="false">summary</button>
         </div>
         <div class="summary-panel" hidden>
           <div class="summary-content"></div>

@@ -106,6 +106,9 @@ function createStoryElement(story) {
   const comments = node.querySelector(".comments");
   comments.textContent = typeof story.comments === "number" ? story.comments : 0;
 
+  const hnLink = node.querySelector(".hn-link");
+  hnLink.href = story.id ? `https://news.ycombinator.com/item?id=${story.id}` : "#";
+
   return node;
 }
 
@@ -115,7 +118,7 @@ async function handleSummaryToggle({ button, panel, storyId }) {
   if (expanded) {
     panel.hidden = true;
     button.setAttribute('aria-expanded', 'false');
-    button.textContent = 'View summary';
+    button.textContent = 'summary';
     return;
   }
   button.disabled = true;
@@ -128,12 +131,12 @@ async function handleSummaryToggle({ button, panel, storyId }) {
     renderSummary(panel, data);
     panel.hidden = false;
     button.setAttribute('aria-expanded', 'true');
-    button.textContent = 'Hide summary';
+    button.textContent = 'hide';
   } catch (e) {
     panel.hidden = false;
     panel.querySelector('.summary-content').innerHTML = `<p>Failed to load summary: ${escapeHtml(e.message)}</p>`;
     button.setAttribute('aria-expanded', 'true');
-    button.textContent = 'Hide summary';
+    button.textContent = 'hide';
   } finally {
     button.disabled = false;
   }
