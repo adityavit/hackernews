@@ -83,3 +83,17 @@ To scrape the Hacker News website to get the top stories from the last 24 hours 
 - [x] Add API route: `GET /api/stories/<id>/comments/summary` (on-demand compute)
 - [ ] Unit tests with mocked LLM client (success, failure, cache hit)
 - [x] Handle retries and basic errors gracefully (Ollama client retries)
+
+### 3) Webpage Content Summarization
+- [x] Create content fetching module (`content_fetcher.py`) with HTML parsing and text extraction
+- [x] Implement robust webpage content extraction with readability focus
+- [x] Add content cleaning and noise removal (ads, navigation, etc.)
+- [x] Create content summarization module (`content_summarizer.py`) with LLM integration
+- [x] Design content analysis prompts for comprehensive webpage summarization
+- [x] Add API route: `GET /api/content/summary?url=<url>` for on-demand webpage analysis
+- [x] Integrate with existing LLM infrastructure (Ollama client, config system)
+- [x] Support LLM configuration overrides via query parameters
+- [x] Add proper error handling for invalid URLs, fetch failures, and LLM errors
+- [x] Include comprehensive metadata (title, content type, fetch status, etc.)
+- [ ] Add caching mechanism for webpage summaries
+- [x] Unit tests for content fetching and summarization modules

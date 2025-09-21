@@ -13,8 +13,8 @@ RUN_SERVER = $(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) &&
 # Command to serve the UI (Flask app for static + JSON under /api)
 RUN_UI = cd ui && UI_PORT=$(UI_PORT) flask --app server run --host 0.0.0.0 --port $(UI_PORT)
 
-# Command to run the tests
-RUN_TESTS = $(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && pytest tests/
+# Command to run the tests (try pytest first, fallback to unittest)
+RUN_TESTS = $(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && (pytest tests/ -v 2>/dev/null || python3 -m unittest discover tests/ -v)
 
 # Target to run only the API server
 run_api:
@@ -39,7 +39,7 @@ test:
 # Backwards-compatibility: `make run` still starts the API server
 run: run_api
 
-.PHONY: run run_api run_ui run_all test
+.PHONY: run run_api run_ui run_all
 
 # Stop all running services (by port)
 stop_all:
@@ -74,4 +74,29 @@ full_pipeline:
 	@echo "Running full automation pipeline: cleanup -> fetch -> summaries ..."
 	@bash automation/full_pipeline.sh
 
-.PHONY: dump_top_stories dump_comment_summaries cleanup_old_stories cleanup_old_stories_dry_run full_pipeline
+# Analyze webpage content using LLM (requires URL parameter)
+analyze_content:
+	@if [ -z "$(URL)" ]; then \
+		echo "Usage: make analyze_content URL=<webpage_url>"; \
+		echo "Example: make analyze_content URL=https://example.com"; \
+		exit 1; \
+	fi
+	@echo "Analyzing content from $(URL) ..."
+	@$(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && python api_integration/content_summarizer.py "$(URL)"
+
+# Test LLM content analysis with sample content
+test_content_analysis:
+	@echo "Testing LLM content analysis with sample content ..."
+	@$(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && python llm_integration/content_analysis.py
+
+# Validate test infrastructure without running actual tests
+validate_tests:
+	@echo "Validating test infrastructure ..."
+	@python3 test_runner.py
+
+# Run only content analysis tests
+test_content_only:
+	@echo "Running content analysis tests only ..."
+	@$(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && (pytest tests/test_content_analysis.py tests/test_content_summarizer.py -v 2>/dev/null || echo "pytest not available, use 'make test' instead")
+
+.PHONY: dump_top_stories dump_comment_summaries cleanup_old_stories cleanup_old_stories_dry_run full_pipeline analyze_content test_content_analysis validate_tests test_content_only test

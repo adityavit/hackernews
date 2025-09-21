@@ -6,6 +6,7 @@ except Exception:  # pragma: no cover
     CORS = None
 from api_integration.scraper import scrape_hacker_news
 from api_integration.comment_scraper import fetch_story_comments
+from api_integration.content_summarizer import summarize_webpage_content
 from llm_integration.analysis import analyze_comments
 from llm_integration.config import env_config, override_config
 
@@ -127,6 +128,50 @@ def get_story_comments_summary(story_id: str):
 
     result = analyze_comments(comments, original_post, cfg)
     return jsonify(result)
+
+
+@app.route("/api/content/summary")
+def get_content_summary():
+    """
+    Generate a summary of webpage content from a given URL.
+
+    Query parameters:
+    - url: Required. The URL to fetch and summarize
+    - ollama_host: Optional. Override Ollama host
+    - chat_model: Optional. Override chat model
+    - embed_model: Optional. Override embedding model
+
+    Returns JSON with content summary and metadata.
+    """
+    url = request.args.get("url")
+    if not url:
+        return jsonify({"error": "URL parameter is required"}), 400
+
+    # Optional LLM configuration overrides
+    config_overrides = {}
+    if request.args.get("ollama_host"):
+        config_overrides["ollama_host"] = request.args.get("ollama_host")
+    if request.args.get("chat_model"):
+        config_overrides["chat_model"] = request.args.get("chat_model")
+    if request.args.get("embed_model"):
+        config_overrides["embed_model"] = request.args.get("embed_model")
+
+    try:
+        # Generate summary
+        result = summarize_webpage_content(url, config=config_overrides if config_overrides else None)
+
+        if result.get("success", False):
+            return jsonify(result)
+        else:
+            return jsonify(result), 500
+
+    except Exception as e:
+        return jsonify({
+            "url": url,
+            "success": False,
+            "error": str(e),
+            "error_type": type(e).__name__
+        }), 500
 
 
 if __name__ == "__main__":

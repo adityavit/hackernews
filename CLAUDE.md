@@ -42,8 +42,10 @@ make stop_all         # Stop both services by port
 
 ### Testing
 ```bash
-make test             # Run pytest tests
-pytest tests/         # Direct pytest execution
+make test                # Run all tests (pytest or unittest fallback)
+make test_content_only   # Run only content analysis tests
+make validate_tests      # Validate test infrastructure without running tests
+pytest tests/            # Direct pytest execution (if available)
 ```
 
 ### Data Operations
@@ -67,7 +69,14 @@ bash automation/setup_cron.sh backup   # Backup current crontab
 ```bash
 python api_integration/scraper.py                    # Scrape top stories
 python api_integration/comment_scraper.py <story_id> # Scrape story comments
+python api_integration/content_summarizer.py <url>   # Analyze webpage content with LLM
 comments-analyze analyze --input comments.json       # Analyze comments with LLM
+```
+
+### Content Analysis
+```bash
+make analyze_content URL=<webpage_url>               # Analyze webpage content using LLM
+make test_content_analysis                           # Test LLM content analysis with sample data
 ```
 
 ## Key Dependencies

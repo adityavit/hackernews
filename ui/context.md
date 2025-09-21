@@ -15,3 +15,13 @@ Create a simple web page that calls the `/api/top-stories` endpoint and renders 
   - [x] Enable CORS on API to allow different origin for local dev.
 - [ ] Optional: client-side sorting/filtering by score/comments.
 - [x] Optional: Makefile targets to serve UI locally (added `run_ui`, `run_all`).
+
+## Recent Updates
+- [x] Complete UI theme transformation to match Hacker News aesthetic
+- [x] Updated color scheme from dark to light theme (orange/beige/white)
+- [x] Added numbered story list with CSS counters
+- [x] Implemented story summary toggle functionality
+- [x] Added Hacker News links for each story
+- [x] Fixed button text consistency for summary toggle
+- [x] Updated API integration to use static JSON files for summaries
+- [x] Enhanced responsive design and accessibility
