@@ -1,0 +1,25 @@
+# Hacker News Automation Cron Jobs
+# This file contains cron job configurations for the Hacker News project
+#
+# To install these cron jobs, run: crontab automation/crontab.txt
+# To view current cron jobs, run: crontab -l
+# To edit cron jobs, run: crontab -e
+#
+# Cron format: MIN HOUR DAY MONTH WEEKDAY COMMAND
+# Examples:
+# 0 */4 * * * - Every 4 hours at minute 0
+# 0 0,4,8,12,16,20 * * * - At 12am, 4am, 8am, 12pm, 4pm, 8pm
+
+# Run full pipeline every 4 hours
+# Logs will be saved to logs/full_pipeline_YYYYMMDD_HHMMSS.log
+0 */4 * * * cd /Users/adib/Code/hackernews && /bin/bash automation/full_pipeline.sh >/dev/null 2>&1
+
+# Alternative schedule options (commented out):
+# Run every 6 hours at minute 0
+# 0 */6 * * * cd /Users/adib/Code/hackernews && /bin/bash automation/full_pipeline.sh >/dev/null 2>&1
+
+# Run twice daily at 6am and 6pm
+# 0 6,18 * * * cd /Users/adib/Code/hackernews && /bin/bash automation/full_pipeline.sh >/dev/null 2>&1
+
+# Run daily at 3am
+# 0 3 * * * cd /Users/adib/Code/hackernews && /bin/bash automation/full_pipeline.sh >/dev/null 2>&1

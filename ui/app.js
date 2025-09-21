@@ -1,7 +1,7 @@
 const isSameOriginApi = !location.port || location.port === "5000";
 const API_BASE = window.API_BASE_URL || (isSameOriginApi ? "" : `http://${location.hostname}:8081`);
 const API_URL = `${API_BASE}/api/top-stories`;
-const SUMMARY_URL = (id, params = "") => `${API_BASE}/api/stories/${id}/comments/summary${params ? `?${params}` : ""}`;
+const SUMMARY_URL = (id) => `${API_BASE}/api/stories/${id}/comments/summary.json`;
 
 function setStatus(message) {
   const status = document.getElementById("status");
@@ -121,7 +121,7 @@ async function handleSummaryToggle({ button, panel, storyId }) {
   button.disabled = true;
   button.textContent = 'Loading…';
   try {
-    const url = SUMMARY_URL(storyId, 'max_depth=1&limit=40');
+    const url = SUMMARY_URL(storyId);
     const res = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();

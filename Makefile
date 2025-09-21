@@ -54,4 +54,24 @@ dump_top_stories:
 	@echo "Dumping top stories JSON to ui/api/top-stories.json ..."
 	@bash automation/dump_top_stories.sh
 
-.PHONY: dump_top_stories
+# Dump comment summaries for all top stories (depends on dump_top_stories)
+dump_comment_summaries: dump_top_stories
+	@echo "Dumping comment summaries for all top stories ..."
+	@$(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && python automation/dump_comment_summaries.py
+
+# Clean up old story directories not in current top stories
+cleanup_old_stories:
+	@echo "Cleaning up old story directories ..."
+	@$(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && python automation/cleanup_old_stories.py --update-top-stories
+
+# Dry run cleanup to see what would be removed
+cleanup_old_stories_dry_run:
+	@echo "Dry run: showing old story directories that would be removed ..."
+	@$(VENV_ACTIVATE) && export PYTHONPATH=$(PYTHONPATH):$(shell pwd) && python automation/cleanup_old_stories.py --update-top-stories --dry-run
+
+# Full automation pipeline: cleanup + fetch stories + generate summaries
+full_pipeline:
+	@echo "Running full automation pipeline: cleanup -> fetch -> summaries ..."
+	@bash automation/full_pipeline.sh
+
+.PHONY: dump_top_stories dump_comment_summaries cleanup_old_stories cleanup_old_stories_dry_run full_pipeline
